@@ -965,6 +965,10 @@
         }
         .template-card-badge.benchmark { background: rgba(24, 144, 255, 0.1); color: var(--primary-color); }
         .template-card-badge.training { background: rgba(82, 196, 26, 0.1); color: var(--success-color); }
+        .template-card-badge.analysis { background: rgba(250, 173, 20, 0.1); color: var(--warning-color); }
+        .template-card-badge.stability { background: rgba(255, 77, 79, 0.1); color: var(--error-color); }
+        .template-card-badge.inference { background: rgba(114, 46, 209, 0.1); color: #722ed1; }
+        .template-card-badge.business { background: rgba(19, 194, 194, 0.1); color: #13c2c2; }
         .template-card-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
         .template-card-description { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; min-height: 60px; }
         .template-card-stats {
@@ -1237,45 +1241,241 @@
                     </p>
                     <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
                         <button class="template-filter-btn active" onclick="filterTemplates('all')">全部</button>
-                        <button class="template-filter-btn" onclick="filterTemplates('benchmark')">🎮 性能测试</button>
-                        <button class="template-filter-btn" onclick="filterTemplates('training')">🧠 AI训练</button>
-                        <button class="template-filter-btn" onclick="filterTemplates('inference')">🚀 推理部署</button>
-                        <button class="template-filter-btn" onclick="filterTemplates('stability')">⏱️ 稳定性测试</button>
+                        <button class="template-filter-btn" onclick="filterTemplates('ml')">🤖 机器学习</button>
+                        <button class="template-filter-btn" onclick="filterTemplates('testing')">⚡ 性能测试</button>
+                        <button class="template-filter-btn" onclick="filterTemplates('analysis')">📊 结果分析</button>
+                        <button class="template-filter-btn" onclick="filterTemplates('stability')">⏱️ 稳定性</button>
+                        <button class="template-filter-btn" onclick="filterTemplates('business')">💼 业务场景</button>
                     </div>
                     <div class="template-grid" id="templateGrid">
-                        <div class="template-card" data-category="benchmark">
-                            <div class="template-card-header">
-                                <div class="template-card-icon">🎮</div>
-                                <div class="template-card-badge benchmark">Benchmark</div>
-                            </div>
-                            <div class="template-card-title">GPU性能基准测试</div>
-                            <div class="template-card-description">完整的GPU性能测试工作流</div>
-                            <div class="template-card-stats">
-                                <span>⭐ 4.8</span>
-                                <span>📥 1,234次使用</span>
-                            </div>
-                            <div class="template-card-tags">
-                                <span class="tag">NVIDIA</span>
-                                <span class="tag">MLPerf</span>
-                            </div>
-                            <button class="template-card-button" onclick="useTemplate('gpu-benchmark')">使用模板</button>
-                        </div>
-                        <div class="template-card" data-category="training">
+                        <!-- 机器学习训练模板 -->
+                        <div class="template-card" data-category="ml">
                             <div class="template-card-header">
                                 <div class="template-card-icon">🧠</div>
-                                <div class="template-card-badge training">Training</div>
+                                <div class="template-card-badge training">ML训练</div>
                             </div>
                             <div class="template-card-title">PyTorch分布式训练</div>
-                            <div class="template-card-description">ResNet-50在ImageNet上的分布式训练</div>
+                            <div class="template-card-description">支持ResNet/VGG/EfficientNet等模型的分布式训练</div>
                             <div class="template-card-stats">
                                 <span>⭐ 4.9</span>
-                                <span>📥 2,156次使用</span>
+                                <span>📥 2,156次</span>
                             </div>
                             <div class="template-card-tags">
                                 <span class="tag">PyTorch</span>
                                 <span class="tag">DDP</span>
+                                <span class="tag">ResNet</span>
                             </div>
-                            <button class="template-card-button" onclick="useTemplate('pytorch-ddp')">使用模板</button>
+                            <button class="template-card-button" onclick="useTemplate('pytorch-training')">使用模板</button>
+                        </div>
+
+                        <div class="template-card" data-category="ml">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">🦙</div>
+                                <div class="template-card-badge training">LLM微调</div>
+                            </div>
+                            <div class="template-card-title">LLM LoRA微调</div>
+                            <div class="template-card-description">大语言模型LoRA微调，支持Llama/Mistral/Qwen等模型</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.8</span>
+                                <span>📥 1,892次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">HuggingFace</span>
+                                <span class="tag">LoRA</span>
+                                <span class="tag">Llama</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('llm-finetuning')">使用模板</button>
+                        </div>
+
+                        <!-- 性能测试模板 -->
+                        <div class="template-card" data-category="testing">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">🎮</div>
+                                <div class="template-card-badge benchmark">GPU测试</div>
+                            </div>
+                            <div class="template-card-title">GPU基准测试</div>
+                            <div class="template-card-description">GPU压力测试和CUDA性能评估</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.8</span>
+                                <span>📥 3,421次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">CUDA</span>
+                                <span class="tag">Benchmark</span>
+                                <span class="tag">Stress</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('gpu-benchmark')">使用模板</button>
+                        </div>
+
+                        <div class="template-card" data-category="testing">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">⚡</div>
+                                <div class="template-card-badge benchmark">综合测试</div>
+                            </div>
+                            <div class="template-card-title">全维度性能测试</div>
+                            <div class="template-card-description">GPU/CPU/内存/网络/存储综合评估</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.7</span>
+                                <span>📥 2,789次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">Comprehensive</span>
+                                <span class="tag">System</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('comprehensive-benchmark')">使用模板</button>
+                        </div>
+
+                        <div class="template-card" data-category="testing">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">💾</div>
+                                <div class="template-card-badge benchmark">存储测试</div>
+                            </div>
+                            <div class="template-card-title">内存/网络/磁盘测试</div>
+                            <div class="template-card-description">内存带宽、网络吞吐量、磁盘IO性能测试</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.6</span>
+                                <span>📥 1,567次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">Memory</span>
+                                <span class="tag">Network</span>
+                                <span class="tag">Disk</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('memory-network-disk-benchmark')">使用模板</button>
+                        </div>
+
+                        <!-- 结果分析模板 -->
+                        <div class="template-card" data-category="analysis">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">🤖</div>
+                                <div class="template-card-badge analysis">AI分析</div>
+                            </div>
+                            <div class="template-card-title">AI分析闭环</div>
+                            <div class="template-card-description">自动收集工作流结果并进行AI智能分析</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.9</span>
+                                <span>📥 1,234次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">AI</span>
+                                <span class="tag">LLM</span>
+                                <span class="tag">Automation</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('ai-analysis-loop')">使用模板</button>
+                        </div>
+
+                        <div class="template-card" data-category="analysis">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">📊</div>
+                                <div class="template-card-badge analysis">训练分析</div>
+                            </div>
+                            <div class="template-card-title">AI训练结果分析</div>
+                            <div class="template-card-description">深度学习训练过程和结果的智能分析</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.7</span>
+                                <span>📥 987次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">Training</span>
+                                <span class="tag">Analysis</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('ai-training-analysis')">使用模板</button>
+                        </div>
+
+                        <!-- 稳定性测试模板 -->
+                        <div class="template-card" data-category="stability">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">⏱️</div>
+                                <div class="template-card-badge stability">稳定性</div>
+                            </div>
+                            <div class="template-card-title">长时间稳定性测试</div>
+                            <div class="template-card-description">7x24小时压力测试，验证系统长期稳定性</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.8</span>
+                                <span>📥 1,456次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">Stability</span>
+                                <span class="tag">24/7</span>
+                                <span class="tag">Stress</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('long-running-stability-test')">使用模板</button>
+                        </div>
+
+                        <div class="template-card" data-category="stability">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">💥</div>
+                                <div class="template-card-badge stability">故障注入</div>
+                            </div>
+                            <div class="template-card-title">故障注入测试</div>
+                            <div class="template-card-description">模拟各种故障场景，测试系统容错能力</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.6</span>
+                                <span>📥 892次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">Chaos</span>
+                                <span class="tag">Fault</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('fault-injection-test')">使用模板</button>
+                        </div>
+
+                        <!-- 业务场景模板 -->
+                        <div class="template-card" data-category="business">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">🚀</div>
+                                <div class="template-card-badge inference">推理测试</div>
+                            </div>
+                            <div class="template-card-title">推理性能测试</div>
+                            <div class="template-card-description">AI模型推理服务性能测试 (ResNet-50, BERT-base等)</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.8</span>
+                                <span>📥 1,678次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">Inference</span>
+                                <span class="tag">PyTorch</span>
+                                <span class="tag">ONNX</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('inference-performance-test')">使用模板</button>
+                        </div>
+
+                        <div class="template-card" data-category="business">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">🔬</div>
+                                <div class="template-card-badge business">科学计算</div>
+                            </div>
+                            <div class="template-card-title">科学计算测试</div>
+                            <div class="template-card-description">高性能科学计算工作负载性能评估</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.5</span>
+                                <span>📥 745次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">HPC</span>
+                                <span class="tag">Scientific</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('scientific-computing-test')">使用模板</button>
+                        </div>
+
+                        <!-- 完整示例模板 -->
+                        <div class="template-card" data-category="testing">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">🔄</div>
+                                <div class="template-card-badge benchmark">完整闭环</div>
+                            </div>
+                            <div class="template-card-title">完整ML训练闭环</div>
+                            <div class="template-card-description">数据准备→模型训练→评估→部署完整流程</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.9</span>
+                                <span>📥 2,345次</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">E2E</span>
+                                <span class="tag">ML</span>
+                                <span class="tag">Production</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('complete-ml-loop')">使用模板</button>
                         </div>
                     </div>
                 </div>
