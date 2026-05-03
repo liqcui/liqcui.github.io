@@ -759,18 +759,158 @@
         }
 
         /* Responsive */
+        /* 响应式设计 - 移动端优化 */
         @media (max-width: 768px) {
+            /* Header 移动端适配 */
             .header h1 { font-size: 32px; }
             .header .subtitle { font-size: 16px; }
-            .nav { flex-wrap: wrap; }
+            .header .stats { gap: 20px; }
+            .stat-item .number { font-size: 28px; }
+
+            /* Navigation 移动端适配 */
+            .nav {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 15px 10px;
+            }
+            .nav-item {
+                flex: 1 1 calc(50% - 8px);
+                min-width: 140px;
+                padding: 10px 8px;
+                font-size: 13px;
+            }
+
+            /* Container 移动端适配 */
+            .container {
+                padding: 15px 10px;
+            }
+
+            /* Grid 移动端适配 */
             .stats-grid { grid-template-columns: 1fr; }
             .gpu-grid { grid-template-columns: 1fr; }
             .ai-model-grid { grid-template-columns: 1fr; }
-            .topology-container { height: 550px; padding: 30px 20px; }
-            .topo-node { width: 85px; height: 85px; font-size: 10px; }
+
+            /* Card 移动端适配 */
+            .card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            .card-title {
+                font-size: 16px;
+            }
+
+            /* Workflow Tab 移动端适配 */
+            .workflow-tab {
+                flex: 1 1 calc(50% - 6px);
+                min-width: 0;
+                padding: 10px 8px;
+                font-size: 12px;
+                text-align: center;
+            }
+
+            /* Template Grid 移动端适配 */
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+            .template-filter-btn {
+                flex: 1 1 calc(50% - 6px);
+                min-width: 0;
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            /* Chat 移动端适配 */
+            .chat-container {
+                padding: 15px;
+            }
+            .chat-bubble {
+                max-width: calc(100vw - 120px);
+                font-size: 14px;
+            }
+            .chat-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+
+            /* AI Input 移动端适配 */
+            .ai-textarea {
+                min-height: 100px;
+                font-size: 14px;
+            }
+            .ai-button {
+                width: 100%;
+                padding: 12px;
+            }
+
+            /* Monitor/Billing Charts 移动端适配 */
+            .chart-container {
+                overflow-x: auto;
+            }
+            .chart-bars {
+                min-width: 100%;
+                height: 250px;
+                gap: 8px;
+            }
+            .chart-bar-wrapper {
+                min-width: 50px;
+            }
+            .chart-bar-value {
+                font-size: 12px;
+            }
+            .chart-bar-label {
+                font-size: 11px;
+            }
+
+            /* Topology 移动端适配 */
+            .topology-container {
+                height: 550px;
+                padding: 30px 20px;
+                overflow-x: auto;
+            }
+            .topo-node {
+                width: 85px;
+                height: 85px;
+                font-size: 10px;
+            }
             .topo-node-icon { font-size: 26px; }
-            .dag-container { height: 450px; }
-            .workflow-canvas { padding: 30px 20px; min-height: 500px; }
+
+            /* DAG Editor 移动端适配 */
+            .dag-container {
+                height: 450px;
+                overflow-x: auto;
+            }
+            .workflow-canvas {
+                padding: 30px 20px;
+                min-height: 500px;
+            }
+            .dag-node {
+                width: 100px;
+                padding: 10px;
+            }
+            .dag-node-icon {
+                font-size: 20px;
+            }
+
+            /* Table 移动端适配 */
+            .task-table,
+            .billing-table,
+            .ai-gateway-table {
+                font-size: 13px;
+            }
+            .task-table th,
+            .task-table td,
+            .billing-table th,
+            .billing-table td {
+                padding: 10px 8px;
+            }
+
+            /* Button 移动端适配 */
+            .btn,
+            .action-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
         }
     
         /* Workflow Tab Styles */
@@ -1025,7 +1165,7 @@
                 <div id="workflow" class="page">
             <!-- Tab Navigation -->
             <div class="card">
-                <div style="display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px;">
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; flex-wrap: wrap;">
                     <button class="workflow-tab active" onclick="switchWorkflowTab('ai-quick')" id="tab-ai-quick">
                         ✨ AI快速创建
                     </button>
