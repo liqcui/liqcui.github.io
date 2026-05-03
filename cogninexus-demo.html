@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CogniNexus - 企业级GPU算力基础架构平台演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1890ff;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --error-color: #ff4d4f;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-primary: #262626;
+            --text-secondary: #8c8c8c;
+            --border-color: #d9d9d9;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: headerGrid 20s linear infinite;
+        }
+
+        @keyframes headerGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-size: 36px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-item .label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Navigation */
+        .nav-container {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            overflow-x: auto;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            color: var(--primary-color);
+            background: rgba(24, 144, 255, 0.04);
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #fafafa 100%);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .stat-card.success { border-left-color: var(--success-color); }
+        .stat-card.warning { border-left-color: var(--warning-color); }
+        .stat-card.error { border-left-color: var(--error-color); }
+
+        .stat-card-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary-color), #40a9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .stat-card-trend {
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .stat-card-trend.up { color: var(--success-color); }
+        .stat-card-trend.down { color: var(--error-color); }
+
+        /* GPU Cards */
+        .gpu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .gpu-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .gpu-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+            border-color: var(--primary-color);
+        }
+
+        .gpu-card.available { border-color: var(--success-color); }
+        .gpu-card.busy { border-color: var(--warning-color); }
+        .gpu-card.error { border-color: var(--error-color); }
+
+        .gpu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .gpu-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .gpu-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .gpu-status.available { background: #f6ffed; color: var(--success-color); }
+        .gpu-status.busy { background: #fff7e6; color: var(--warning-color); }
+        .gpu-status.error { background: #fff2f0; color: var(--error-color); }
+
+        .gpu-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .gpu-metrics {
+            margin-top: 12px;
+        }
+
+        .gpu-metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #40a9ff);
+            transition: width 1s ease-out;
+        }
+
+        .progress-fill.success { background: linear-gradient(90deg, var(--success-color), #73d13d); }
+        .progress-fill.warning { background: linear-gradient(90deg, var(--warning-color), #ffc53d); }
+        .progress-fill.error { background: linear-gradient(90deg, var(--error-color), #ff7875); }
+
+        /* Compact Workflow DAG */
+        .workflow-canvas {
+            background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
+            border: 2px solid #e6f7ff;
+            border-radius: 12px;
+            padding: 40px 60px;
+            min-height: 550px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dag-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+        .dag-node {
+            position: absolute;
+            background: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            min-width: 140px;
+            max-width: 160px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .dag-node:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .dag-node.pending {
+            border-color: #d9d9d9;
+            opacity: 0.8;
+        }
+
+        .dag-node.running {
+            border-color: var(--primary-color);
+            animation: nodeRunning 2s ease-in-out infinite;
+        }
+
+        @keyframes nodeRunning {
+            0%, 100% {
+                box-shadow: 0 2px 12px rgba(24, 144, 255, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(24, 144, 255, 0.8);
+            }
+        }
+
+        .dag-node.succeeded {
+            border-color: var(--success-color);
+        }
+
+        .dag-node-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .dag-node-icon {
+            font-size: 20px;
+        }
+
+        .dag-node-title {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .dag-node-status {
+            margin-top: 6px;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .dag-node-status.pending { background: #f0f0f0; color: #8c8c8c; }
+        .dag-node-status.running { background: #e6f7ff; color: var(--primary-color); }
+        .dag-node-status.succeeded { background: #f6ffed; color: var(--success-color); }
+
+        .dag-node-metrics {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 11px;
+        }
+
+        .dag-node-metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 2px 0;
+        }
+
+        /* SVG for arrows */
+        .dag-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .dag-arrow {
+            fill: none;
+            stroke: #1890ff;
+            stroke-width: 2;
+            marker-end: url(#arrowhead);
+            opacity: 0.5;
+        }
+
+        .dag-arrow.active {
+            stroke-width: 2.5;
+            opacity: 0.8;
+            animation: dashFlow 1.5s linear infinite;
+            stroke-dasharray: 6;
+        }
+
+        @keyframes dashFlow {
+            to { stroke-dashoffset: -12; }
+        }
+
+        /* Compact Topology */
+        .topology-container {
+            position: relative;
+            height: 700px;
+            background: radial-gradient(circle at 50% 50%, #f0f7ff 0%, #ffffff 100%);
+            border-radius: 12px;
+            padding: 50px 60px;
+        }
+
+        .topo-node {
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            color: white;
+        }
+
+        .topo-node:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            z-index: 10;
+        }
+
+        .topo-node-icon {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+
+        .topo-link {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(24,144,255,0.3), rgba(24,144,255,0.6), rgba(24,144,255,0.3));
+            transform-origin: 0 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+        }
+
+        th {
+            background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge.success { background: #f6ffed; color: var(--success-color); }
+        .badge.warning { background: #fff7e6; color: var(--warning-color); }
+        .badge.error { background: #fff2f0; color: var(--error-color); }
+        .badge.info { background: #e6f7ff; color: var(--primary-color); }
+        .badge.running { background: #e6f7ff; color: var(--primary-color); }
+        .badge.pending { background: #f0f0f0; color: var(--text-secondary); }
+
+        /* Chart */
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            min-height: 350px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 300px;
+            gap: 12px;
+            padding-bottom: 40px;
+        }
+
+        .chart-bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+        }
+
+        .chart-bar {
+            width: 100%;
+            background: linear-gradient(to top, var(--primary-color), #40a9ff);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 -4px 12px rgba(24, 144, 255, 0.3);
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.05);
+        }
+
+        .chart-bar-label {
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .chart-bar-value {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+
+        /* AI Model Cards */
+        .ai-model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .ai-model-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: all 0.4s;
+            border: 2px solid transparent;
+        }
+
+        .ai-model-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+            border-color: var(--primary-color);
+        }
+
+        .ai-model-card.running {
+            border-color: var(--success-color);
+        }
+
+        .ai-model-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .ai-model-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .ai-model-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .ai-model-info .provider {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .ai-model-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .ai-stat {
+            text-align: center;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+
+        .ai-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .ai-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Architecture */
+        .arch-container {
+            background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .arch-layer {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        .arch-layer:hover {
+            transform: scale(1.01);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .arch-layer-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .arch-components {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .arch-component {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f4ff 100%);
+            border: 2px solid #91d5ff;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .arch-component:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .data-flow {
+            position: absolute;
+            width: 3px;
+            height: 30px;
+            background: linear-gradient(180deg, transparent, var(--primary-color), transparent);
+            left: 50%;
+            margin-left: -1.5px;
+            animation: flowDown 3s ease-in-out infinite;
+        }
+
+        @keyframes flowDown {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 32px; }
+            .header .subtitle { font-size: 16px; }
+            .nav { flex-wrap: wrap; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .gpu-grid { grid-template-columns: 1fr; }
+            .ai-model-grid { grid-template-columns: 1fr; }
+            .topology-container { height: 550px; padding: 30px 20px; }
+            .topo-node { width: 85px; height: 85px; font-size: 10px; }
+            .topo-node-icon { font-size: 26px; }
+            .dag-container { height: 450px; }
+            .workflow-canvas { padding: 30px 20px; min-height: 500px; }
+        }
+    
+        /* Workflow Tab Styles */
+        .workflow-tab {
+            background: white;
+            border: 2px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .workflow-tab:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        .workflow-tab.active { background: var(--primary-color); border-color: var(--primary-color); color: white; }
+        .workflow-tab-content { display: none; }
+        .workflow-tab-content.active { display: block; }
+
+        /* Template Styles */
+        .template-filter-btn {
+            background: white;
+            border: 2px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .template-filter-btn:hover { border-color: var(--primary-color); }
+        .template-filter-btn.active { background: var(--primary-color); color: white; }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .template-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        .template-card:hover { border-color: var(--primary-color); transform: translateY(-4px); }
+        .template-card-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+        .template-card-icon { font-size: 32px; }
+        .template-card-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .template-card-badge.benchmark { background: rgba(24, 144, 255, 0.1); color: var(--primary-color); }
+        .template-card-badge.training { background: rgba(82, 196, 26, 0.1); color: var(--success-color); }
+        .template-card-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .template-card-description { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; min-height: 60px; }
+        .template-card-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        .template-card-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .template-card-tags .tag {
+            background: var(--bg-color);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .template-card-button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), #0050b3);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .template-card-button:hover { transform: translateY(-2px); }
+
+        /* AI Input Styles */
+        .ai-input-container { margin-bottom: 20px; }
+        .ai-input-label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .ai-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            resize: vertical;
+        }
+        .ai-button {
+            background: linear-gradient(135deg, var(--primary-color), #0050b3);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .ai-button:hover { transform: translateY(-2px); }
+
+        /* Chat Styles */
+        .chat-container {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-y: auto;
+        }
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .chat-message.user { flex-direction: row-reverse; }
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .chat-avatar.user { background: linear-gradient(135deg, #1890ff, #40a9ff); }
+        .chat-avatar.ai { background: linear-gradient(135deg, #52c41a, #73d13d); }
+        .chat-bubble {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 600px;
+        }
+        .chat-message.user .chat-bubble { background: linear-gradient(135deg, #1890ff, #40a9ff); color: white; }
+        .chat-time { font-size: 12px; color: #999; margin-top: 4px; }
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🚀 CogniNexus</h1>
+        <div class="subtitle">企业级GPU算力基础架构平台</div>
+        <div class="stats">
+            <div class="stat-item">
+                <span class="number" id="totalGPUs">256</span>
+                <span class="label">GPU总数</span>
+            </div>
+            <div class="stat-item">
+                <span class="number" id="activeJobs">1,247</span>
+                <span class="label">运行任务</span>
+            </div>
+            <div class="stat-item">
+                <span class="number">99.97%</span>
+                <span class="label">可用性</span>
+            </div>
+            <div class="stat-item">
+                <span class="number">8</span>
+                <span class="label">AI模型</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-container">
+        <div class="nav">
+            <div class="nav-item active" onclick="showPage('dashboard')">📊 总览</div>
+            <div class="nav-item" onclick="showPage('gpu')">🎮 GPU资源</div>
+            <div class="nav-item" onclick="showPage('tasks')">📋 任务管理</div>
+            <div class="nav-item" onclick="showPage('workflow')">🔄 工作流</div>
+            <div class="nav-item" onclick="showPage('monitor')">📈 监控告警</div>
+            <div class="nav-item" onclick="showPage('billing')">💰 计费管理</div>
+            <div class="nav-item" onclick="showPage('ai-gateway')">🤖 AI网关</div>
+            <div class="nav-item" onclick="showPage('architecture')">🏗️ 架构设计</div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div class="stats-grid">
+                <div class="stat-card success">
+                    <div class="stat-card-value">128</div>
+                    <div class="stat-card-label">可用GPU</div>
+                    <div class="stat-card-trend up">↑ 12% 较昨日</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">98</div>
+                    <div class="stat-card-label">运行中GPU</div>
+                    <div class="stat-card-trend">稳定运行</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-card-value">25</div>
+                    <div class="stat-card-label">待调度任务</div>
+                    <div class="stat-card-trend">正常排队</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-card-value">87.5%</div>
+                    <div class="stat-card-label">GPU平均利用率</div>
+                    <div class="stat-card-trend up">↑ 5.2%</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🎯 集群概览</div>
+                <div class="chart-container">
+                    <div class="chart-bars" id="clusterChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPU Resources Page -->
+        <div id="gpu" class="page">
+            <div class="card">
+                <div class="card-title">🎮 GPU节点监控</div>
+                <div class="gpu-grid" id="gpuGrid"></div>
+            </div>
+        </div>
+
+        <!-- Tasks Page -->
+        <div id="tasks" class="page">
+            <div class="card">
+                <div class="card-title">📋 运行任务列表</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>任务ID</th>
+                                <th>任务名称</th>
+                                <th>租户</th>
+                                <th>GPU数量</th>
+                                <th>状态</th>
+                                <th>运行时长</th>
+                            </tr>
+                        </thead>
+                        <tbody id="taskTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Page -->
+                <div id="workflow" class="page">
+            <!-- Tab Navigation -->
+            <div class="card">
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px;">
+                    <button class="workflow-tab active" onclick="switchWorkflowTab('ai-quick')" id="tab-ai-quick">
+                        ✨ AI快速创建
+                    </button>
+                    <button class="workflow-tab" onclick="switchWorkflowTab('dag')" id="tab-dag">
+                        🔄 DAG编辑器
+                    </button>
+                    <button class="workflow-tab" onclick="switchWorkflowTab('templates')" id="tab-templates">
+                        📚 模板库
+                    </button>
+                    <button class="workflow-tab" onclick="switchWorkflowTab('ai-chat')" id="tab-ai-chat">
+                        💬 AI智能助手
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab 1: AI Quick Creator (默认显示) -->
+            <div id="workflow-tab-ai-quick" class="workflow-tab-content active">
+                <div class="card">
+                    <div class="card-title">✨ AI自然语言工作流创建器</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        使用自然语言描述您的需求，AI将自动为您生成完整的工作流模板
+                    </p>
+                    <div class="ai-input-container">
+                        <label class="ai-input-label">描述您的工作流需求：</label>
+                        <textarea
+                            id="workflowNlInput"
+                            class="ai-textarea"
+                            placeholder="例如：创建GPU性能测试工作流，测试A100计算能力..."
+                        ></textarea>
+                        <button class="ai-button" onclick="generateWorkflowInTab()">
+                            🤖 AI生成工作流
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: DAG Editor (原始内容) -->
+            <div id="workflow-tab-dag" class="workflow-tab-content">
+<div class="card">
+                <div class="card-title">🔄 工作流DAG可视化 (紧凑布局)</div>
+                <div class="workflow-canvas">
+                    <div class="dag-container" id="dagContainer">
+                        <svg class="dag-svg" id="dagSvg">
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                    <polygon points="0 0, 10 3, 0 6" fill="#1890ff" />
+                                </marker>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📈 工作流执行统计</div>
+                <div class="chart-container">
+                    <div class="chart-bars" id="workflowChart"></div>
+                </div>
+            </div>
+        </div>
+            </div>
+
+            <!-- Tab 3: Template Library -->
+            <div id="workflow-tab-templates" class="workflow-tab-content">
+                <div class="card">
+                    <div class="card-title">📚 工作流模板库</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        预定义的工作流模板，可直接使用或作为自定义模板的起点
+                    </p>
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                        <button class="template-filter-btn active" onclick="filterTemplates('all')">全部</button>
+                        <button class="template-filter-btn" onclick="filterTemplates('benchmark')">🎮 性能测试</button>
+                        <button class="template-filter-btn" onclick="filterTemplates('training')">🧠 AI训练</button>
+                        <button class="template-filter-btn" onclick="filterTemplates('inference')">🚀 推理部署</button>
+                        <button class="template-filter-btn" onclick="filterTemplates('stability')">⏱️ 稳定性测试</button>
+                    </div>
+                    <div class="template-grid" id="templateGrid">
+                        <div class="template-card" data-category="benchmark">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">🎮</div>
+                                <div class="template-card-badge benchmark">Benchmark</div>
+                            </div>
+                            <div class="template-card-title">GPU性能基准测试</div>
+                            <div class="template-card-description">完整的GPU性能测试工作流</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.8</span>
+                                <span>📥 1,234次使用</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">NVIDIA</span>
+                                <span class="tag">MLPerf</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('gpu-benchmark')">使用模板</button>
+                        </div>
+                        <div class="template-card" data-category="training">
+                            <div class="template-card-header">
+                                <div class="template-card-icon">🧠</div>
+                                <div class="template-card-badge training">Training</div>
+                            </div>
+                            <div class="template-card-title">PyTorch分布式训练</div>
+                            <div class="template-card-description">ResNet-50在ImageNet上的分布式训练</div>
+                            <div class="template-card-stats">
+                                <span>⭐ 4.9</span>
+                                <span>📥 2,156次使用</span>
+                            </div>
+                            <div class="template-card-tags">
+                                <span class="tag">PyTorch</span>
+                                <span class="tag">DDP</span>
+                            </div>
+                            <button class="template-card-button" onclick="useTemplate('pytorch-ddp')">使用模板</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: AI Chat Assistant -->
+            <div id="workflow-tab-ai-chat" class="workflow-tab-content">
+                <div class="card">
+                    <div class="card-title">💬 AI交互式工作流助手</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        通过与AI对话，逐步构建您的工作流
+                    </p>
+                    <div class="chat-container" id="workflowChatContainer" style="height: 400px;">
+                        <div class="chat-message ai">
+                            <div class="chat-avatar ai">🤖</div>
+                            <div>
+                                <div class="chat-bubble">您好！我是工作流AI助手。请告诉我您想创建什么类型的工作流？</div>
+                                <div class="chat-time">刚刚</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ai-input-container">
+                        <textarea
+                            id="workflowChatInput"
+                            class="ai-textarea"
+                            style="min-height: 80px;"
+                            placeholder="输入您的回复..."
+                            onkeydown="handleWorkflowChatKeyPress(event)"
+                        ></textarea>
+                        <button class="ai-button" onclick="sendWorkflowChatMessage()">💬 发送消息</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitor Page -->
+        <div id="monitor" class="page">
+            <div class="stats-grid">
+                <div class="stat-card success">
+                    <div class="stat-card-value">99.97%</div>
+                    <div class="stat-card-label">系统可用性</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">87.5%</div>
+                    <div class="stat-card-label">GPU平均利用率</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-card-value">3</div>
+                    <div class="stat-card-label">待处理告警</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-card-value">125ms</div>
+                    <div class="stat-card-label">平均响应时间</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 GPU利用率趋势</div>
+                <div class="chart-container">
+                    <div class="chart-bars" id="monitorChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Billing Page -->
+        <div id="billing" class="page">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-value">¥12,450</div>
+                    <div class="stat-card-label">本月总费用</div>
+                    <div class="stat-card-trend up">↑ 8.5%</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-card-value">¥8,900</div>
+                    <div class="stat-card-label">GPU费用</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">¥2,340</div>
+                    <div class="stat-card-label">存储费用</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">¥1,210</div>
+                    <div class="stat-card-label">流量费用</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💰 费用分布</div>
+                <div class="chart-container">
+                    <div class="chart-bars" id="billingChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Gateway Page -->
+        <div id="ai-gateway" class="page">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-value">8</div>
+                    <div class="stat-card-label">支持模型</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-card-value">12.5K</div>
+                    <div class="stat-card-label">今日调用</div>
+                    <div class="stat-card-trend up">↑ 18.3%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">125ms</div>
+                    <div class="stat-card-label">平均响应</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-card-value">99.97%</div>
+                    <div class="stat-card-label">可用性</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🇨🇳 国产AI大模型 + 国际模型</div>
+                <div class="ai-model-grid" id="aiModelGrid"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 模型调用统计</div>
+                <div class="chart-container">
+                    <div class="chart-bars" id="aiCallsChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture Page -->
+        <div id="architecture" class="page">
+            <div class="card">
+                <div class="card-title">🏗️ 系统网络拓扑 (紧凑布局)</div>
+                <div class="topology-container" id="topologyContainer"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📐 七层架构设计</div>
+                <div class="arch-container" id="archContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (pageId === 'workflow') initWorkflowAnimation();
+            else if (pageId === 'gpu') initGPUAnimation();
+            else if (pageId === 'architecture') initTopologyAnimation();
+        }
+
+        // Dashboard Chart
+        function initDashboardChart() {
+            const data = [
+                { label: 'A100', value: 96, color: 'linear-gradient(to top, #52c41a, #73d13d)' },
+                { label: 'H100', value: 64, color: 'linear-gradient(to top, #1890ff, #40a9ff)' },
+                { label: 'V100', value: 64, color: 'linear-gradient(to top, #faad14, #ffc53d)' },
+                { label: 'T4', value: 32, color: 'linear-gradient(to top, #ff4d4f, #ff7875)' },
+            ];
+            renderChart('clusterChart', data);
+        }
+
+        // Task Table
+        function initTaskTable() {
+            const tasks = [
+                { id: 'job-1247', name: 'ResNet-50训练', tenant: '租户A', gpus: 8, status: 'running', duration: '2h 34m' },
+                { id: 'job-1246', name: 'BERT微调', tenant: '租户B', gpus: 4, status: 'running', duration: '1h 12m' },
+                { id: 'job-1245', name: 'GPT推理', tenant: '租户C', gpus: 16, status: 'success', duration: '45m' },
+                { id: 'job-1244', name: 'Stable Diffusion', tenant: '租户A', gpus: 2, status: 'running', duration: '3h 21m' },
+                { id: 'job-1243', name: 'YOLO训练', tenant: '租户D', gpus: 8, status: 'pending', duration: '-' },
+            ];
+
+            const tbody = document.getElementById('taskTableBody');
+            tbody.innerHTML = tasks.map(task => `
+                <tr>
+                    <td><code>${task.id}</code></td>
+                    <td>${task.name}</td>
+                    <td>${task.tenant}</td>
+                    <td>${task.gpus}</td>
+                    <td><span class="badge ${task.status}">${task.status.toUpperCase()}</span></td>
+                    <td>${task.duration}</td>
+                </tr>
+            `).join('');
+        }
+
+        // GPU Animation
+        function initGPUAnimation() {
+            const gpus = [
+                { name: 'GPU-Node-01', model: 'NVIDIA A100', memory: 80, status: 'available', util: 0, temp: 32 },
+                { name: 'GPU-Node-02', model: 'NVIDIA A100', memory: 80, status: 'busy', util: 87, temp: 68 },
+                { name: 'GPU-Node-03', model: 'NVIDIA H100', memory: 80, status: 'busy', util: 95, temp: 72 },
+                { name: 'GPU-Node-04', model: 'NVIDIA V100', memory: 32, status: 'available', util: 0, temp: 35 },
+                { name: 'GPU-Node-05', model: 'NVIDIA A100', memory: 80, status: 'busy', util: 76, temp: 65 },
+                { name: 'GPU-Node-06', model: 'NVIDIA H100', memory: 80, status: 'error', util: 0, temp: 85 },
+            ];
+
+            const grid = document.getElementById('gpuGrid');
+            grid.innerHTML = gpus.map(gpu => `
+                <div class="gpu-card ${gpu.status}">
+                    <div class="gpu-header">
+                        <div class="gpu-name">${gpu.name}</div>
+                        <div class="gpu-status ${gpu.status}">${gpu.status.toUpperCase()}</div>
+                    </div>
+                    <div class="gpu-info-item">
+                        <span>型号</span>
+                        <span>${gpu.model}</span>
+                    </div>
+                    <div class="gpu-info-item">
+                        <span>显存</span>
+                        <span>${gpu.memory}GB</span>
+                    </div>
+                    <div class="gpu-metrics">
+                        <div class="gpu-metric">
+                            <span>利用率</span>
+                            <span>${gpu.util}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${gpu.util > 80 ? 'warning' : gpu.util > 0 ? 'success' : ''}"
+                                 style="width: ${gpu.util}%"></div>
+                        </div>
+                        <div class="gpu-metric" style="margin-top: 12px;">
+                            <span>温度</span>
+                            <span>${gpu.temp}°C</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${gpu.temp > 75 ? 'error' : gpu.temp > 60 ? 'warning' : ''}"
+                                 style="width: ${gpu.temp}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            setInterval(() => {
+                const cards = document.querySelectorAll('.gpu-card.busy');
+                cards.forEach(card => {
+                    const fills = card.querySelectorAll('.progress-fill');
+                    fills[0].style.width = (Math.random() * 30 + 70) + '%';
+                });
+            }, 2000);
+        }
+
+        // Compact Workflow DAG - No Overlap
+        function initWorkflowAnimation() {
+            const container = document.getElementById('dagContainer');
+            const svg = document.getElementById('dagSvg');
+
+            // Wider layout - using horizontal space, no overlap
+            const nodes = [
+                { id: 'start', title: '开始', icon: '🚀', status: 'succeeded', x: 500, y: 20 },
+                { id: 'data', title: '数据加载', icon: '📥', status: 'succeeded', x: 500, y: 110 },
+                { id: 'train1', title: '训练-1', icon: '🎮', status: 'running', x: 250, y: 210, gpu: '8xA100', time: '2h34m' },
+                { id: 'train2', title: '训练-2', icon: '🎮', status: 'running', x: 750, y: 210, gpu: '8xH100', time: '1h45m' },
+                { id: 'validate', title: '验证', icon: '✅', status: 'pending', x: 500, y: 330 },
+                { id: 'deploy', title: '部署', icon: '🚀', status: 'pending', x: 500, y: 430 },
+            ];
+
+            const edges = [
+                { from: 'start', to: 'data' },
+                { from: 'data', to: 'train1' },
+                { from: 'data', to: 'train2' },
+                { from: 'train1', to: 'validate' },
+                { from: 'train2', to: 'validate' },
+                { from: 'validate', to: 'deploy' },
+            ];
+
+            container.querySelectorAll('.dag-node').forEach(n => n.remove());
+            svg.querySelectorAll('path').forEach(p => p.remove());
+
+            // Create nodes
+            nodes.forEach(node => {
+                const div = document.createElement('div');
+                div.className = `dag-node ${node.status}`;
+                div.style.left = node.x + 'px';
+                div.style.top = node.y + 'px';
+
+                let metrics = '';
+                if (node.gpu) {
+                    metrics = `
+                        <div class="dag-node-metrics">
+                            <div class="dag-node-metric">
+                                <span>GPU:</span>
+                                <span>${node.gpu}</span>
+                            </div>
+                            <div class="dag-node-metric">
+                                <span>时长:</span>
+                                <span>${node.time}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = `
+                    <div class="dag-node-header">
+                        <div class="dag-node-icon">${node.icon}</div>
+                        <div class="dag-node-title">${node.title}</div>
+                    </div>
+                    <div class="dag-node-status ${node.status}">${node.status.toUpperCase()}</div>
+                    ${metrics}
+                `;
+                container.appendChild(div);
+            });
+
+            // Create edges
+            edges.forEach(edge => {
+                const from = nodes.find(n => n.id === edge.from);
+                const to = nodes.find(n => n.id === edge.to);
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const x1 = from.x + 70;
+                const y1 = from.y + 60;
+                const x2 = to.x + 70;
+                const y2 = to.y;
+
+                const d = `M ${x1} ${y1} C ${x1} ${(y1 + y2) / 2}, ${x2} ${(y1 + y2) / 2}, ${x2} ${y2}`;
+                path.setAttribute('d', d);
+                path.classList.add('dag-arrow');
+                if (from.status === 'succeeded' || from.status === 'running') {
+                    path.classList.add('active');
+                }
+                svg.appendChild(path);
+            });
+
+            // Animation
+            let step = 0;
+            const steps = ['start', 'data', 'train1', 'train2', 'validate', 'deploy'];
+            setInterval(() => {
+                if (step < steps.length) {
+                    const nodeEls = container.querySelectorAll('.dag-node');
+                    if (step > 0) {
+                        const prev = nodeEls[step - 1];
+                        prev.className = prev.className.replace(/running|pending/, 'succeeded');
+                    }
+                    const current = nodeEls[step];
+                    if (current && !current.classList.contains('succeeded')) {
+                        current.className = current.className.replace(/pending/, 'running');
+                    }
+                    step++;
+                } else {
+                    step = 0;
+                    container.querySelectorAll('.dag-node').forEach((n, i) => {
+                        if (i < 2) n.className = n.className.replace(/running|pending/, 'succeeded');
+                        else n.className = n.className.replace(/running|succeeded/, 'pending');
+                    });
+                }
+            }, 3000);
+        }
+
+        // Workflow Chart
+        function initWorkflowChart() {
+            const data = [
+                { label: '成功', value: 1245, color: 'linear-gradient(to top, #52c41a, #73d13d)' },
+                { label: '运行中', value: 98, color: 'linear-gradient(to top, #1890ff, #40a9ff)' },
+                { label: '待执行', value: 25, color: 'linear-gradient(to top, #faad14, #ffc53d)' },
+                { label: '失败', value: 12, color: 'linear-gradient(to top, #ff4d4f, #ff7875)' },
+            ];
+            renderChart('workflowChart', data);
+        }
+
+        // Monitor Chart
+        function initMonitorChart() {
+            const data = [
+                { label: '00:00', value: 65 },
+                { label: '04:00', value: 45 },
+                { label: '08:00', value: 82 },
+                { label: '12:00', value: 95 },
+                { label: '16:00', value: 88 },
+                { label: '20:00', value: 72 },
+            ];
+            renderChart('monitorChart', data);
+        }
+
+        // Billing Chart
+        function initBillingChart() {
+            const data = [
+                { label: 'GPU', value: 8900, color: 'linear-gradient(to top, #1890ff, #40a9ff)' },
+                { label: '存储', value: 2340, color: 'linear-gradient(to top, #52c41a, #73d13d)' },
+                { label: '流量', value: 1210, color: 'linear-gradient(to top, #faad14, #ffc53d)' },
+            ];
+            renderChart('billingChart', data);
+        }
+
+        // AI Models
+        function initAIModels() {
+            const models = [
+                { name: 'DeepSeek', provider: 'DeepSeek AI', icon: '🧠', logo: 'linear-gradient(135deg, #4158D0, #C850C0)', status: 'running', calls: 3245, latency: 98 },
+                { name: '通义千问', provider: '阿里云', icon: '🌐', logo: 'linear-gradient(135deg, #FA8BFF, #2BD2FF)', status: 'running', calls: 2856, latency: 112 },
+                { name: '百川大模型', provider: '百川智能', icon: '🚀', logo: 'linear-gradient(135deg, #FF6B95, #FF9068)', status: 'running', calls: 1892, latency: 135 },
+                { name: '智谱AI', provider: '智谱AI', icon: '🌟', logo: 'linear-gradient(135deg, #0093E9, #80D0C7)', status: 'running', calls: 1523, latency: 145 },
+                { name: 'Claude 3.5', provider: 'Anthropic', icon: '🤖', logo: 'linear-gradient(135deg, #667eea, #764ba2)', status: 'running', calls: 1234, latency: 156 },
+                { name: 'GPT-4', provider: 'OpenAI', icon: '🎯', logo: 'linear-gradient(135deg, #41B883, #00C896)', status: 'running', calls: 945, latency: 189 },
+            ];
+
+            const grid = document.getElementById('aiModelGrid');
+            grid.innerHTML = models.map(m => `
+                <div class="ai-model-card ${m.status}">
+                    <div class="ai-model-header">
+                        <div class="ai-model-logo" style="background: ${m.logo}">${m.icon}</div>
+                        <div class="ai-model-info">
+                            <h3>${m.name}</h3>
+                            <div class="provider">${m.provider}</div>
+                        </div>
+                    </div>
+                    <div class="ai-model-stats">
+                        <div class="ai-stat">
+                            <div class="ai-stat-value">${m.calls}</div>
+                            <div class="ai-stat-label">今日调用</div>
+                        </div>
+                        <div class="ai-stat">
+                            <div class="ai-stat-value">${m.latency}ms</div>
+                            <div class="ai-stat-label">平均延迟</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            setInterval(() => {
+                const stats = document.querySelectorAll('.ai-stat-value');
+                stats.forEach((stat, i) => {
+                    if (i % 2 === 0) {
+                        stat.textContent = parseInt(stat.textContent) + Math.floor(Math.random() * 10);
+                    }
+                });
+            }, 5000);
+        }
+
+        // AI Calls Chart
+        function initAICallsChart() {
+            const data = [
+                { label: 'DeepSeek', value: 3245 },
+                { label: '千问', value: 2856 },
+                { label: '百川', value: 1892 },
+                { label: '智谱', value: 1523 },
+                { label: 'Claude', value: 1234 },
+                { label: 'GPT-4', value: 945 },
+            ];
+            renderChart('aiCallsChart', data);
+        }
+
+        // Compact Topology - No Overlap
+        function initTopologyAnimation() {
+            const container = document.getElementById('topologyContainer');
+
+            // Optimized positioning - 7 nodes with expanded spacing, no overlap
+            const nodes = [
+                { id: 'frontend', label: '前端层', icon: '🖥️', x: 50, y: 5, bg: 'linear-gradient(135deg, #667eea, #764ba2)' },
+                { id: 'gateway', label: 'API网关', icon: '🌐', x: 50, y: 18, bg: 'linear-gradient(135deg, #f093fb, #f5576c)' },
+                { id: 'service1', label: '核心服务', icon: '⚙️', x: 25, y: 35, bg: 'linear-gradient(135deg, #4facfe, #00f2fe)' },
+                { id: 'service2', label: '调度引擎', icon: '🚀', x: 75, y: 35, bg: 'linear-gradient(135deg, #43e97b, #38f9d7)' },
+                { id: 'ai', label: 'AI网关', icon: '🤖', x: 50, y: 52, bg: 'linear-gradient(135deg, #fa709a, #fee140)' },
+                { id: 'data', label: '数据层', icon: '💾', x: 50, y: 69, bg: 'linear-gradient(135deg, #30cfd0, #330867)' },
+                { id: 'k8s', label: 'Kubernetes', icon: '☸️', x: 50, y: 86, bg: 'linear-gradient(135deg, #a8edea, #fed6e3)' },
+            ];
+
+            const links = [
+                { from: 'frontend', to: 'gateway' },
+                { from: 'gateway', to: 'service1' },
+                { from: 'gateway', to: 'service2' },
+                { from: 'service1', to: 'ai' },
+                { from: 'service2', to: 'ai' },
+                { from: 'ai', to: 'data' },
+                { from: 'data', to: 'k8s' },
+            ];
+
+            container.innerHTML = '';
+
+            // Create links (adjust for larger nodes)
+            links.forEach(link => {
+                const from = nodes.find(n => n.id === link.from);
+                const to = nodes.find(n => n.id === link.to);
+                const el = document.createElement('div');
+                el.className = 'topo-link';
+                const x1 = from.x, y1 = from.y + 7.8, x2 = to.x, y2 = to.y;
+                const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                el.style.left = x1 + '%';
+                el.style.top = y1 + '%';
+                el.style.width = length + '%';
+                el.style.transform = `rotate(${angle}deg)`;
+                container.appendChild(el);
+            });
+
+            // Create nodes (110px diameter, so offset by 55px)
+            nodes.forEach(node => {
+                const el = document.createElement('div');
+                el.className = 'topo-node';
+                el.style.left = `calc(${node.x}% - 55px)`;
+                el.style.top = `calc(${node.y}% - 55px)`;
+                el.style.background = node.bg;
+                el.innerHTML = `<div class="topo-node-icon">${node.icon}</div><div>${node.label}</div>`;
+                container.appendChild(el);
+            });
+        }
+
+        // Architecture
+        function initArchitecture() {
+            const container = document.getElementById('archContainer');
+            const layers = [
+                { title: '🖥️ 前端展示层', components: ['Dashboard', 'GPU管理', '任务调度', '工作流编排', '监控告警', '计费管理', 'AI网关'] },
+                { title: '🌐 API网关层', components: ['Apache APISIX', '认证授权', '限流控制', '路由转发', '负载均衡'] },
+                { title: '⚙️ 核心服务层', components: ['Auth Service', 'GPU Manager', 'Scheduler', 'Job Manager', 'Workflow Svc', 'Monitor Svc', 'Billing Svc', 'Tenant Mgmt'] },
+                { title: '🤖 AI智能网关层', components: ['🇨🇳 DeepSeek', '🇨🇳 通义千问', '🇨🇳 百川大模型', '🇨🇳 智谱AI', '🌐 Claude 3.5', '🌐 GPT-4', '🏠 本地vLLM'] },
+                { title: '💾 数据中间件层', components: ['PostgreSQL', 'VictoriaMetrics', 'Redis Cluster', 'NATS JetStream', 'Kafka', 'MinIO'] },
+                { title: '☸️ Kubernetes编排层', components: ['Argo Workflows', 'GPU Operator', 'Device Plugin', 'DCGM Exporter', 'Prometheus', 'Grafana'] },
+                { title: '🎮 GPU物理节点层', components: ['Node 1-64 (A100)', 'Node 65-128 (H100)', 'Node 129-192 (V100)', 'NVLink Fabric', 'InfiniBand'] },
+            ];
+
+            container.innerHTML = layers.map((layer, i) => `
+                <div class="arch-layer">
+                    <div class="data-flow" style="animation-delay: ${i * 0.5}s;"></div>
+                    <div class="arch-layer-title">${layer.title}</div>
+                    <div class="arch-components">
+                        ${layer.components.map(c => `<div class="arch-component">${c}</div>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Chart Helper
+        function renderChart(id, data) {
+            const maxValue = Math.max(...data.map(d => d.value));
+            const chart = document.getElementById(id);
+            chart.innerHTML = data.map(d => `
+                <div class="chart-bar-wrapper">
+                    <div class="chart-bar" style="height: ${(d.value / maxValue) * 250}px; ${d.color ? 'background: ' + d.color : ''}">
+                        <div class="chart-bar-value">${d.value}</div>
+                    </div>
+                    <div class="chart-bar-label">${d.label}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize all
+
+        // ===== Workflow Tab Functions =====
+        function switchWorkflowTab(tabName) {
+            document.querySelectorAll('.workflow-tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.workflow-tab').forEach(btn => btn.classList.remove('active'));
+
+            const targetTab = document.getElementById('workflow-tab-' + tabName);
+            const targetBtn = document.getElementById('tab-' + tabName);
+            if (targetTab) targetTab.classList.add('active');
+            if (targetBtn) targetBtn.classList.add('active');
+        }
+
+        function filterTemplates(category) {
+            document.querySelectorAll('.template-filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.template-card').forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function useTemplate(templateId) {
+            alert('正在加载模板: ' + templateId);
+            switchWorkflowTab('dag');
+        }
+
+        function generateWorkflowInTab() {
+            const input = document.getElementById('workflowNlInput').value.trim();
+            if (!input) { alert('请输入工作流需求描述'); return; }
+
+            const button = event.target;
+            button.disabled = true;
+            button.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; margin: 0 auto; border-width: 2px;"></div>';
+
+            setTimeout(() => {
+                button.disabled = false;
+                button.innerHTML = '🤖 AI生成工作流';
+                alert('工作流已生成！切换到DAG编辑器查看');
+                switchWorkflowTab('dag');
+            }, 2000);
+        }
+
+        function sendWorkflowChatMessage() {
+            const input = document.getElementById('workflowChatInput');
+            const message = input.value.trim();
+            if (!message) { alert('请输入消息'); return; }
+
+            addWorkflowChatMessage('user', message);
+            input.value = '';
+
+            setTimeout(() => {
+                const responses = [
+                    "好的！请问您想测试哪种类型的GPU？",
+                    "明白了。请问您需要多少个GPU？",
+                    "收到！请问测试时长大约多久？",
+                    "很好！正在为您生成工作流模板..."
+                ];
+                addWorkflowChatMessage('ai', responses[Math.floor(Math.random() * responses.length)]);
+            }, 1000);
+        }
+
+        function addWorkflowChatMessage(role, message) {
+            const container = document.getElementById('workflowChatContainer');
+            const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message ' + role;
+            messageDiv.innerHTML = `
+                <div class="chat-avatar ${role}">${role === 'user' ? '👤' : '🤖'}</div>
+                <div>
+                    <div class="chat-bubble">${message}</div>
+                    <div class="chat-time">${time}</div>
+                </div>
+            `;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleWorkflowChatKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendWorkflowChatMessage();
+            }
+        }
+
+        function init() {
+            initDashboardChart();
+            initTaskTable();
+            initGPUAnimation();
+            initWorkflowAnimation();
+            initWorkflowChart();
+            initMonitorChart();
+            initBillingChart();
+            initAIModels();
+            initAICallsChart();
+            initTopologyAnimation();
+            initArchitecture();
+
+            setInterval(() => {
+                document.getElementById('totalGPUs').textContent = 256 + Math.floor(Math.random() * 10 - 5);
+                document.getElementById('activeJobs').textContent = '1,' + (247 + Math.floor(Math.random() * 20 - 10));
+            }, 5000);
+        }
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
